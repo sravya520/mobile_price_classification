@@ -1,0 +1,62 @@
+import streamlit as st
+import pandas as pd
+from sklearn.ensemble import RandomForestClassifier
+
+# Load your dataset
+df = pd.read_csv("/content/train.csv")
+
+# Separate features and target variable
+X_train = df.iloc[:, :-1]  # Features
+y_train = df.iloc[:, -1]   # Target variable
+
+# Train a simple RandomForestClassifier for demonstration purposes
+model = RandomForestClassifier()
+model.fit(X_train, y_train)
+
+# Streamlit app
+st.title("Mobile Price Prediction App")
+
+# User input for features
+bluetooth = st.checkbox("Bluetooth")
+touch_screen = st.checkbox("Touch Screen")
+memory = st.slider("Memory (GB)", min_value=1, max_value=256, step=1)
+ram = st.slider("RAM (GB)", min_value=1, max_value=12, step=1)
+wifi = st.checkbox("WiFi")
+duel_sim = st.checkbox("Dual SIM")
+
+# Prepare user input for prediction
+user_input = {
+    'battery_power': 0,  # Assign a placeholder value for numerical features
+    'blue': 1 if bluetooth else 0,
+    'clock_speed': 0,
+    'dual_sim': 1 if duel_sim else 0,
+    'fc': 0,
+    'four_g': 0,
+    'int_memory': 0,
+    'm_dep': 0,
+    'mobile_wt': 0,
+    'n_cores': 0,
+    'pc': 0,
+    'px_height': 0,
+    'px_width': 0,
+    'ram': ram,
+    'sc_h': 0,
+    'sc_w': 0,
+    'talk_time': 0,
+    'three_g': 0,
+    'touch_screen': 1 if touch_screen else 0,
+    'wifi': 1 if wifi else 0,
+}
+
+# Create a DataFrame with a single row using the user input
+user_input_df = pd.DataFrame([user_input])
+
+# Set column names for user_input_df to match the training data
+user_input_df.columns = X_train.columns
+
+# Make prediction
+prediction = model.predict(user_input_df)[0]
+
+# Display the predicted price range
+st.subheader("Predicted Price Range:")
+st.write(f"The predicted price range is: {prediction}")
